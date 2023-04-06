@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from  .serializers import *
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from .permissions import IsOwnerOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticated,IsAuthenticatedOrReadOnly
+from .permissions import IsAdminOrReadOnly
 from rest_framework.views import APIView
 from rest_framework import generics
 from django.contrib.auth.models import update_last_login
@@ -66,8 +66,8 @@ class LoginView(APIView):
                 update_last_login(None, user)
                 response = {
                             'access': str(token.access_token),
-                            'referesh_token':str(token),
                             "access_token_life_time_in_seconds" : jwt_access_token_lifetime.total_seconds(),
+                            'referesh_token':str(token),
                             "refresh_token_life_time_in_seconds" : jwt_refresh_token_lifetime.total_seconds(),
                         }
                 status_code = status.HTTP_200_OK
@@ -77,9 +77,9 @@ class LoginView(APIView):
 
 '''------------- CRUD operations ------------'''
 class projectDetails(APIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = [IsAdminOrReadOnly, ]
+        
     def get_object(self, pk):
-        print("🚀 ~ file: views.py ~ line 44 ~ id", pk)
         try:
             user = self.request.user
             return Project.objects.filter(created_by=user).get(pk=pk)
@@ -88,7 +88,6 @@ class projectDetails(APIView):
 
     def get(self, request, pk, format=None):
         project_data = self.get_object(pk)
-        print("🚀 ~ file: views.py ~ line 55 ~ project_data", project_data)
         serializer = projectSerializer(project_data, context={'request':request})
         return Response(serializer.data)
     
@@ -99,85 +98,83 @@ class projectDetails(APIView):
                 created_by = self.request.user 
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)
 
     def patch(self, request, pk, format=None):
         project_data = self.get_object(pk)
-        serializer = projectSerializer(project_data, data=request.data)
-        print("🚀 ~ file: views.py ~ line 63 ~ serializer", serializer)
+        serializer = projectSerializer(project_data, data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)
 
     def put(self, request, pk, format=None):
         project_data = self.get_object(pk)
-        serializer = projectSerializer(project_data, data=request.data, partial=True)
-        print("🚀 ~ file: views.py ~ line 62 ~ serializer", serializer)
+        serializer = projectSerializer(project_data, data=request.data, partial=True, context={'request':request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, pk, format=None):
         project_data = self.get_object(pk)
         project_data.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+    def get(self, request):
+        project_data = Project.objects.all()
+        serializer = projectSerializer(project_data, many=True)
+        return Response(serializer.data)
+    
 '''---------------task assigning---------------'''
 class TaskView(APIView): 
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-
-    def get(self, request, format=None):
-        project_data = Task.objects.all()
-        print("🚀 ~ file: views.py ~ line 55 ~ project_data", project_data)
-        serializer = taskSerializer(project_data, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, format=None):
-        project = Project.objects.get()
-        serializer = taskSerializer(data=request.data, context={'request':request})
-        if project.created_by != self.request.user:
-           return Response({'error': 'Project not found'}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    permission_classes = [IsAdminOrReadOnly, ]
 
     def get_object(self, pk):
         print("🚀 ~ file: views.py ~ line 44 ~ id", pk)
         try:
             user = self.request.user
-            return Task.objects.filter(project=user).get(pk=pk)
-        except Project.DoesNotExist as e:
+            return Task.objects.filter(user=user).get(pk=pk)
+        except Task.DoesNotExist as e:
             raise Http404 from e
 
     def get(self, request, pk, format=None):
-        project_data = self.get_object(pk)
-        print("🚀 ~ file: views.py ~ line 55 ~ project_data", project_data)
-        serializer = projectSerializer(project_data, context={'request':request})
+        task_data = self.get_object(pk)
+        serializer = taskSerializer(task_data, context={'request':request})
         return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = taskSerializer(data=request.data, context={'request':request})
+        if serializer.is_valid():
+            serializer.save(
+                user = self.request.user
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)
     
     def patch(self, request, pk, format=None):
-        project_data = self.get_object(pk)
-        serializer = taskSerializer(project_data, data=request.data)
-        print("🚀 ~ file: views.py ~ line 63 ~ serializer", serializer)
+        task_data = self.get_object(pk)
+        serializer = taskSerializer(task_data, data=request.data, context={'request':request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)
 
     def put(self, request, pk, format=None):
-        project_data = self.get_object(pk)
-        serializer = taskSerializer(project_data, data=request.data, partial=True)
-        print("🚀 ~ file: views.py ~ line 62 ~ serializer", serializer)
+        task_data = self.get_object(pk)
+        serializer = taskSerializer(task_data, data=request.data, partial=True, context={'request':request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, pk, format=None):
-        project_data = self.get_object(pk)
-        project_data.delete()
+        task_data = self.get_object(pk)
+        task_data.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def get(self, request, format=None):
+        task_data = Task.objects.all()
+        serializer = taskSerializer(task_data, many=True)
+        return Response(serializer.data)
+    

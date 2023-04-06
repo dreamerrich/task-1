@@ -65,11 +65,10 @@ class projectSerializer(serializers.ModelSerializer):
         return user
     
 class taskSerializer(serializers.ModelSerializer):
-    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
-  #  user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
+    user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
     class Meta:
       model = Task
-      fields = ('project', 'task_name', 'description', 'assign_to')
+      fields = ('project', 'task_name', 'description', 'assign_to', 'user')
 
 class permissionSerializer(serializers.ModelSerializer):
    class Meta:

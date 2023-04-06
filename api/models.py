@@ -67,25 +67,12 @@ class Project(models.Model):
     def __str__(self):
         return str(self.UUID)
 
-class taskAsinee(models.Model):
-    name = models.CharField(max_length=255)
-    language = models.CharField(max_length=255,default='react', choices=language)
-
-    def __str__(self):
-        return str(self.name)
-
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     task_name = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
-    assign_to = models.ForeignKey(taskAsinee, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class Permission(models.Model):
-    name = models.ForeignKey(taskAsinee, on_delete=models.CASCADE)
+    name = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.CharField(max_length=255)
-
-    class Meta:
-        permissions = [
-            ("view_project", "Can view project"),
-        ]

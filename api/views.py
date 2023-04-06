@@ -178,3 +178,20 @@ class TaskView(APIView):
         serializer = taskSerializer(task_data, many=True)
         return Response(serializer.data)
     
+'''---------------permission---------------'''
+    
+class PermissionsView(APIView):
+    permission_classes = [IsAuthenticated, ]
+    def post(self, request, format=None):
+        serializer = permissionSerializer(data=request.data, context={'request':request})
+        if serializer.is_valid():
+            serializer.save(
+                name = self.request.user
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)
+    
+    def get(self, request, format=None):
+        permission_data = Permission.objects.all()
+        serializer = taskSerializer(permission_data, many=True)
+        return Response(serializer.data)

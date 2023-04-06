@@ -68,15 +68,10 @@ class taskSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
     class Meta:
       model = Task
-      fields = ('project', 'task_name', 'description', 'assign_to', 'user')
+      fields = ('project', 'task_name', 'description', 'user')
 
 class permissionSerializer(serializers.ModelSerializer):
+   name = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
    class Meta:
       model = Permission
-      fields = '__all__'
-
-class taskasineeSerializer(serializers.ModelSerializer):
-  
-   class Meta:
-      model = taskAsinee
-      fields = '__all__'
+      fields = ('name', 'description')

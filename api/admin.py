@@ -7,11 +7,7 @@ class ProjectAdmin(admin.ModelAdmin):
 admin.site.register(Project, ProjectAdmin)
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('id','project', 'task_name', 'description', 'assign_to', 'user')
+    list_display = ('id','project', 'task_name', 'description', 'user')
 admin.site.register(Task, TaskAdmin)
 
 admin.site.register(Permission)
-
-class TaskasineeAdmin(admin.ModelAdmin):
-    list_display = ('id','name','language')
-admin.site.register(taskAsinee, TaskasineeAdmin)

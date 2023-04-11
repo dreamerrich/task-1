@@ -10,7 +10,7 @@ JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
 JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import CustomUser,Project
+from .models import *
 from django.conf import settings
 from django.contrib.auth import authenticate
 from rest_framework import status
@@ -58,7 +58,6 @@ class LoginView(APIView):
             token = RefreshToken.for_user(user)
 
             user = authenticate(username=username, password=password)
-            print("🚀 ~ file: views.py ~ line 42 ~ user", user)
             if user is not None:
                 payload = JWT_PAYLOAD_HANDLER(user)
                 jwt_access_token_lifetime =  settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME']
@@ -121,25 +120,28 @@ class projectDetails(APIView):
         project_data.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    def get(self, request):
-        project_data = Project.objects.all()
-        serializer = projectSerializer(project_data, many=True)
-        return Response(serializer.data)
+    # def get(self, request):
+    #     project_data = Project.objects.all()
+    #     serializer = projectSerializer(project_data, many=True)
+    #     return Response(serializer.data)
     
 '''---------------task assigning---------------'''
 class TaskView(APIView): 
     permission_classes = [IsAdminOrReadOnly, ]
-
     def get_object(self, pk):
         print("🚀 ~ file: views.py ~ line 44 ~ id", pk)
         try:
             user = self.request.user
-            return Task.objects.filter(user=user).get(pk=pk)
+            print("🚀 ~ file: views.py:137 ~ user:", user)
+            user_task = Task.objects.filter(user=user).get(pk)
+            print("🚀 ~ file: views.py:135 ~ user_task:", user_task)
+            return user_task
         except Task.DoesNotExist as e:
             raise Http404 from e
 
     def get(self, request, pk, format=None):
         task_data = self.get_object(pk)
+        print("🚀 ~ file: views.py:145 ~ task_data:", task_data)
         serializer = taskSerializer(task_data, context={'request':request})
         return Response(serializer.data)
 
@@ -173,10 +175,10 @@ class TaskView(APIView):
         task_data.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    def get(self, request, format=None):
-        task_data = Task.objects.all()
-        serializer = taskSerializer(task_data, many=True)
-        return Response(serializer.data)
+    # def get_data(self, request, format=None):
+    #     task_data = Task.objects.all()
+    #     serializer = taskSerializer(task_data, many=True)
+    #     return Response(serializer.data)
     
 '''---------------permission---------------'''
     

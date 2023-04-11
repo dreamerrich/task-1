@@ -45,15 +45,15 @@ class CustomUser(AbstractBaseUser):
         return self.username
 
     def has_perm(self, perm, obj=None):
-        "Does the user have a specific permission?"
+        
         return self.is_admin
 
     def has_module_perms(self, app_label):
-        "Does the user have permissions to view the app `app_label`?"
+        
         return True
     @property
     def is_staff(self):
-        "Is the user a member of staff?"
+        
         return self.is_admin
 
 class Project(models.Model):
@@ -66,13 +66,17 @@ class Project(models.Model):
 
     def __str__(self):
         return str(self.UUID)
+    
+class Permission(models.Model):
+    name = models.ForeignKey(User, on_delete=models.CASCADE)
+    can_edit = models.BooleanField(default=False)
+    can_delete = models.BooleanField(default=False)
+    can_create = models.BooleanField(default=False)
 
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     task_name = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
 
-class Permission(models.Model):
-    name = models.ForeignKey(User, on_delete=models.CASCADE)
-    description = models.CharField(max_length=255)

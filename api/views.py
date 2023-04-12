@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from  .serializers import *
-from rest_framework.permissions import AllowAny, IsAuthenticated,IsAuthenticatedOrReadOnly
-from .permissions import IsAdminOrReadOnly
+from rest_framework.permissions import AllowAny
+from .permissions import IsAdminOrReadOnly, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import generics
 from django.contrib.auth.models import update_last_login
@@ -127,13 +127,13 @@ class projectDetails(APIView):
     
 '''---------------task assigning---------------'''
 class TaskView(APIView): 
-    permission_classes = [IsAdminOrReadOnly, ]
+    permission_classes = [IsAuthenticated]
     def get_object(self, pk):
         print("🚀 ~ file: views.py ~ line 44 ~ id", pk)
         try:
             user = self.request.user
             print("🚀 ~ file: views.py:137 ~ user:", user)
-            user_task = Task.objects.filter(user=user).get(pk)
+            user_task = Task.objects.filter(user=user).get(project=pk)
             print("🚀 ~ file: views.py:135 ~ user_task:", user_task)
             return user_task
         except Task.DoesNotExist as e:

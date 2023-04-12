@@ -66,17 +66,15 @@ class Project(models.Model):
 
     def __str__(self):
         return str(self.UUID)
-    
-class Permission(models.Model):
-    name = models.ForeignKey(User, on_delete=models.CASCADE)
-    can_edit = models.BooleanField(default=False)
-    can_delete = models.BooleanField(default=False)
-    can_create = models.BooleanField(default=False)
 
 class Task(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, default=789654)
     task_name = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
 
+class Permission(models.Model):
+    name = models.ForeignKey(Task, on_delete=models.CASCADE)
+    can_edit = models.BooleanField(default=False)
+    can_delete = models.BooleanField(default=False)
+    can_create = models.BooleanField(default=False)

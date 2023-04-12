@@ -65,7 +65,7 @@ class projectSerializer(serializers.ModelSerializer):
         return user
     
 class taskSerializer(serializers.ModelSerializer):
-   
+    user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
     class Meta:
       model = Task
       fields = ('project', 'task_name', 'description', 'user')

@@ -9,4 +9,5 @@ urlpatterns = [
     path('task', TaskView.as_view()),
     path('task/<int:pk>', TaskView.as_view()),
     path('permission',PermissionsView.as_view()),
+    path('permission/<int:pk>',PermissionsView.as_view()),
 ]

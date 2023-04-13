@@ -7,9 +7,9 @@ class ProjectAdmin(admin.ModelAdmin):
 admin.site.register(Project, ProjectAdmin)
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ( 'task_name', 'description', 'user', 'project')
+    list_display = ( 'id','project','task_name', 'description', 'assign_to')
 admin.site.register(Task, TaskAdmin)
 
 class PermissionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'work', 'can_edit', 'can_delete', 'can_create')
+    list_display = ('id','name', 'project', 'can_edit', 'can_delete', 'can_create')
 admin.site.register(Permission, PermissionAdmin)

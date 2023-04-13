@@ -65,13 +65,13 @@ class projectSerializer(serializers.ModelSerializer):
         return user
     
 class taskSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
+    assign_to = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
     class Meta:
       model = Task
-      fields = ('project', 'task_name', 'description', 'user')
+      fields = ('project', 'task_name', 'description', 'assign_to')
 
 class permissionSerializer(serializers.ModelSerializer):
    name = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
    class Meta:
       model = Permission
-      fields = ('name', 'work', 'can_edit', 'can_delete', 'can_create')
+      fields = ('name', 'project', 'can_edit', 'can_delete', 'can_create')

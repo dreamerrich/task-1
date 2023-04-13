@@ -185,15 +185,15 @@ class TaskView(APIView):
 class PermissionsView(APIView):
     permission_classes = [IsAuthenticated, ]
     def post(self, request, format=None):
-        serializer = permissionSerializer(data=request.data, context={'request':request})
+        serializer = permissionSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(
-                name = self.request.user
-            )
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)
     
     def get(self, request, format=None):
-        permission_data = Permission.objects.all()
-        serializer = taskSerializer(permission_data, many=True)
+        user = self.request.user
+        permission_data = Permission.objects.filter(name=user).all()
+        print("🚀 ~ file: views.py:198 ~ permission_data:", permission_data)
+        serializer = permissionSerializer(permission_data, context={'request':request}, many=True)
         return Response(serializer.data)

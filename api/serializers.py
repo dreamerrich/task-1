@@ -74,4 +74,4 @@ class permissionSerializer(serializers.ModelSerializer):
    name = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
    class Meta:
       model = Permission
-      fields = ('name', 'description')
+      fields = ('name', 'work', 'can_edit', 'can_delete', 'can_create')

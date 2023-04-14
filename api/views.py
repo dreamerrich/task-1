@@ -120,28 +120,24 @@ class projectDetails(APIView):
         project_data.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    # def get(self, request):
-    #     project_data = Project.objects.all()
-    #     serializer = projectSerializer(project_data, many=True)
-    #     return Response(serializer.data)
+    def get_data(self, request):
+        project_data = Project.objects.all()
+        serializer = projectSerializer(project_data, many=True)
+        return Response(serializer.data)
     
 '''---------------task assigning---------------'''
 class TaskView(APIView): 
     permission_classes = [IsAuthenticated]
     def get_object(self, pk):
-        print("🚀 ~ file: views.py ~ line 44 ~ id", pk)
         try:
             user = self.request.user
-            print("🚀 ~ file: views.py:137 ~ user:", user)
             user_task = Task.objects.filter(assign_to=user).get(id=pk)
-            print("🚀 ~ file: views.py:135 ~ user_task:", user_task)
             return user_task
         except Task.DoesNotExist as e:
             raise Http404 from e
 
     def get(self, request, pk, format=None):
         task_data = self.get_object(pk)
-        print("🚀 ~ file: views.py:145 ~ task_data:", task_data)
         serializer = taskSerializer(task_data, context={'request':request})
         return Response(serializer.data)
 
@@ -175,10 +171,10 @@ class TaskView(APIView):
         task_data.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    # def get_data(self, request, format=None):
-    #     task_data = Task.objects.all()
-    #     serializer = taskSerializer(task_data, many=True)
-    #     return Response(serializer.data)
+    def get_data(self, request, format=None):
+        task_data = Task.objects.all()
+        serializer = taskSerializer(task_data, many=True)
+        return Response(serializer.data)
     
 '''---------------permission---------------'''
     
@@ -191,26 +187,21 @@ class PermissionsView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)
     
-    # def get(self, request, format=None):
-    #     user = self.request.user
-    #     permission_data = Permission.objects.filter(name=user).all()
-    #     print("🚀 ~ file: views.py:198 ~ permission_data:", permission_data)
-    #     serializer = permissionSerializer(permission_data, context={'request':request}, many=True)
-    #     return Response(serializer.data)
+    def get_data(self, request, format=None):
+        user = self.request.user
+        permission_data = Permission.objects.filter(name=user).all()
+        serializer = permissionSerializer(permission_data, context={'request':request}, many=True)
+        return Response(serializer.data)
     
     def get_object(self, pk):
-        print("🚀 ~ file: views.py ~ line 44 ~ id", pk)
         try:
             user = self.request.user
-            print("🚀 ~ file: views.py:137 ~ user:", user)
             user_role = Permission.objects.filter(name=user).get(project=pk)
-            print("🚀 ~ file: views.py:135 ~ user_task:", user_role)
             return user_role
         except Task.DoesNotExist as e:
             raise Http404 from e
 
     def get(self, request, pk, format=None):
         role_data = self.get_object(pk)
-        print("🚀 ~ file: views.py:145 ~ task_data:", role_data)
         serializer = permissionSerializer(role_data, context={'request':request})
         return Response(serializer.data)

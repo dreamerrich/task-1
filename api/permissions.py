@@ -14,12 +14,10 @@ class IsAdminOrReadOnly(BasePermission):
 #     def has_permission(self, request, view):
 #         if request.method == 'POST':
 #             user = request.user
-#             print("🚀 ~ file: permissions.py:19 ~ user:", user)
 
 #             user_role = Permission.objects.get(name=user)
-#             print("🚀 ~ file: permissions.py:20 ~ role:", user_role)
+#            
 #             if user_role and user_role.can_create:
-#                 print(">>>>>>>>>>if inside>>>>>>>>>>")
 #                 return True
             
 #             return False
@@ -30,13 +28,10 @@ class IsAuthenticated(BasePermission):
     def has_permission(self, request, view):
         if request.method == 'DELETE':
             id = view.kwargs.get('pk')
-            print("🚀 ~ file: permissions.py:33 ~ id:", id)
 
             user = request.user
             user_role = Permission.objects.filter(name=user).get(project=id)
-            print("🚀 ~ file: permissions.py:26 ~ user_role:", user_role)
             if user_role and user_role.can_delete:
-                print(">>>>>>>>>>if inside>>>>>>>>>>")
                 return True
 
             return False
@@ -46,13 +41,10 @@ class IsAuthenticated(BasePermission):
     def has_permission(self, request, view):
         if request.method == 'PUT':
             id = view.kwargs.get('pk')
-            print("🚀 ~ file: permissions.py:33 ~ id:", id)
 
             user = request.user
             user_role = Permission.objects.filter(name=user).get(project=id)
-            print("🚀 ~ file: permissions.py:26 ~ user_role:", user_role)
             if user_role and user_role.can_edit:
-                print(">>>>>>>>>>if inside>>>>>>>>>>")
                 return True
 
             return False
@@ -62,13 +54,10 @@ class IsAuthenticated(BasePermission):
     def has_permission(self, request, view):
         if request.method == 'PATCH':
             id = view.kwargs.get('pk')
-            print("🚀 ~ file: permissions.py:33 ~ id:", id)
 
             user = request.user
             user_role = Permission.objects.filter(name=user).get(project=id)
-            print("🚀 ~ file: permissions.py:26 ~ user_role:", user_role)
             if user_role and user_role.can_edit:
-                print(">>>>>>>>>>if inside>>>>>>>>>>")
                 return True
 
             return False
@@ -78,12 +67,9 @@ class IsAuthenticated(BasePermission):
     def has_permission(self, request, view):
         if request.method == 'POST':
             user = request.user
-            print("🚀 ~ file: permissions.py:19 ~ user:", user)
 
             user_role = Permission.objects.get(name=user)
-            print("🚀 ~ file: permissions.py:20 ~ role:", user_role)
             if user_role and user_role.can_create:
-                print(">>>>>>>>>>if inside>>>>>>>>>>")
                 return True
             
             return False
